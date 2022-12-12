@@ -24,17 +24,25 @@ int main() {
     }
     while(1) {
         memset(&senderAddress, 0, sizeof(senderAddress));
-        int senderAddressLen = sizeof(senderAddress);
+        unsigned int senderAddressLen = sizeof(senderAddress);
         int senderSocket = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
         if(senderSocket == -1){
             printf("accept() failed");
             // need to close the socket
             return -1;
         }
-
-
-
-
+        //measure the time of first part
+        //save the time
+        //send back authentication
+        //change CC Algorithm
+        //resive the second part
+        //measure the time of second part
+        //save the time
+        //if get exit message:
+            //print times
+            //print avrg time of first part
+            //print avvrg time of secind part
+            //brake;
     }
 
 }

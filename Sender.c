@@ -1,12 +1,12 @@
 //
 // Created by alon on 12/7/22.
 //
-#include <sys/stat.h>
 #include "Sender.h"
 #define port 8888
 #define IP "127.0.0.1"
 
 int main(){
+    printf("a");
     FILE * fPointer;
     fPointer = fopen( "2mb_file.txt","r");
     struct stat st;
@@ -16,14 +16,12 @@ int main(){
     int halfSize = size/2;
     char firstHalf[halfSize];
     fgets(firstHalf, halfSize ,fPointer);
-    if(size % 2 == 1){
-        char secondHalf[halfSize +1];
-        fgets(secondHalf, halfSize + 1, fPointer + halfSize);
+    int seconedHalfSize = halfSize;
+    if(size % 2 == 1) {
+        seconedHalfSize++;
     }
-    else {
-        char secondHalf[halfSize];
-        fgets(secondHalf, halfSize, fPointer + halfSize);
-    }
+        char secondHalf[seconedHalfSize];
+        fgets(secondHalf, seconedHalfSize, fPointer + halfSize);
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1) {
@@ -42,17 +40,47 @@ int main(){
     if(connectCheck == -1){
         printf("connect() failed");
     }
-    //setsockopt(sock  );
+    char CC[10] ="reno";
+    int lenCC = strlen(CC);
+    int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, lenCC );
+    if(checkSSO == -1){
+        printf("setsockopt() failed");
+    }
+// authentication check
+//
+//
+    char again = 'y';
+    while (again == 'y' || again == 'Y') {
+
+        send(sock, firstHalf, halfSize, 0);
 //send the first part
 //
 //change CC algorithm.
+        strcpy(CC, "cubic");
+        lenCC = strlen(CC);
+        int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, lenCC);
+        if (checkSSO2 == -1) {
+            printf("second setsockopt() failed");
+        }
 //
 //send the second part
+        if( send(sock, secondHalf, seconedHalfSize, 0) == -1){
+            printf("send() failed");
+        }
 //
 // do u want to send again?
-//
-//
-
-
+        again = '0';
+        while ((again !='y') &&(again !='Y') && (again !='N') &&(again !='n')  ) {
+            printf("do u want to send again? (y/n)");
+            scanf("%c", &again);
+        }
+    }
+ //send exit message ????????????????
+    send(sock, "exit message",13,0);
+//close tcp connection:
+    printf("closing connection...");
+    close(sock);
+    printf("connection closed");
 //close the file
+    fclose(fPointer);
 }
