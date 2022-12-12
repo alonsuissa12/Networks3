@@ -3,6 +3,7 @@
 //
 
 #include "Receiver.h"
+#define FILE_SIZE 2167736
 int main() {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in senderAddress;
@@ -35,51 +36,78 @@ int main() {
     firstNodePart1.next = NULL;
     struct timeNode* lastNodePart1 = &firstNodePart1;
     struct timeNode* lastNodePart2 = &firstNodePart2;
-
+    char MsgFirstHalf[FILE_SIZE / 2] = { '0'};
+    char MsgSecondHalf[(FILE_SIZE / 2) + 1] = { '0'};
     while(1) {
         memset(&senderAddress, 0, sizeof(senderAddress));
         unsigned int senderAddressLen = sizeof(senderAddress);
-        //receive the second part + measure the time of second part:
-        clock_t start , end;
-        start = clock();
-        int senderSocket = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
-        end = clock();
-        double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
-        if(senderSocket == -1){
+        int senderSock = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
+        if (senderSock == -1) {
             printf("accept() failed");
             close(sock);
             return -1;
         }
+        //receive the second part + measure the time of second part:
+        clock_t start , end;
+        start = clock();
+        int got = 0;
+        int bytes = 0;
+        while (got <= FILE_SIZE / 2) {
+            bytes = (int)(recv(senderSock, MsgFirstHalf,(FILE_SIZE/2), 0));
+            if(bytes == -1){
+                printf("error in recv()");
+            }
+            if(bytes <= 2) {
+                break;
+            }
+            got = got + bytes;
+        }
+        end = clock();
+        if(bytes <= 2) {
+            break;
+        }
+        double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
         //save the time:
         struct timeNode n;
         n.time = measureTime;
         n.next = NULL;
         lastNodePart1->next = &n;
         lastNodePart1 = &n;
-        //send back authentication
+        //********************send back authentication:**********************
         char CC[6] ="reno";
-        if(setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1){
+        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1){
             printf("setsockopt() failed");
         }
         //
-            //to be compleated!!!^^^
+        //*********************to be compleated******************
         //
         //
-        //change CC Algorithm
+        //change CC Algorithm:
         strcpy(CC , "cubic");
-        if(setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1) {
+        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1) {
             printf("setsockopt() failed");
         }
         //receive the second part + measure the time of second part
         start = clock();
-        senderSocket = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
-        end = clock();
-        if(senderSocket == -1){
-            printf("accept() failed \nclosing socket");
-            close(sock);
-            return -1;
+        got = 0;
+        int add = 0;
+        if(FILE_SIZE % 2 == 1){
+            add ++;
         }
-
+        while (got <= (FILE_SIZE / 2) + add) {
+            bytes = (int)(recv(senderSock, MsgSecondHalf,(FILE_SIZE/2) + 1, 0));
+            if(bytes == -1){
+                printf("error in recv()");
+            }
+            if( bytes <=2) {
+                break;
+            }
+            got = got + bytes;
+        }
+        end = clock();
+        if(bytes < 2 ) {
+            break;
+        }
         //save the time
         lastNodePart2->next = &n;
         n.time =measureTime;
@@ -89,7 +117,29 @@ int main() {
             //print times
             //print avrg time of first part
             //print avvrg time of secind part
-            //brake;
+            // brake;
     }
+    int index1 = 1;
+    int index2 = 1;
+    double sum1 = 0;
+    double sum2 = 0;
+    struct timeNode * Pnode = firstNodePart1.next;
+    while(Pnode != 0){
+        double time = (Pnode->time);
+        sum1 = sum1 +time;
+        printf("time of first part , of Packet %d is: %f \n" , index1 , time);
+        Pnode = Pnode->next;
+    }
+    double avg = sum1 / index1 ;
+    printf("the average of first part is: %f\n" , avg);
+    Pnode = firstNodePart2.next;
+    while(Pnode != 0) {
+        double time = (Pnode->time);
+        sum2 = sum2 + time;
+        printf("time of second part , of Packet %d is: %f \n", index1, time);
+        Pnode = Pnode->next;
+    }
+    avg = sum2 / index2 ;
+    printf("the average of second part is: %f\n" , avg);
 return 0;
 }

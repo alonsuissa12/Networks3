@@ -4,8 +4,6 @@
 #include "Sender.h"
 
 int main(){
-    printf("a"); // check
-    printf("ddgh");
     FILE * fPointer;
     fPointer = fopen( "2mb_file.txt","r");
     struct stat st;
@@ -50,7 +48,7 @@ int main(){
     }
     char again = 'y';
     while (again == 'y' || again == 'Y') {
-        char CC[10] ="reno";
+        char CC[7] ="reno";
         int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) );
         if(checkSSO == -1){
             printf("setsockopt() failed");
@@ -65,7 +63,6 @@ int main(){
 
 //change CC algorithm.
         strcpy(CC, "cubic");
-        printf("2\n");
         int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, strlen(CC));
         if (checkSSO2 == -1) {
             printf("second setsockopt() failed");
