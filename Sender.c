@@ -2,26 +2,34 @@
 // Created by alon on 12/7/22.
 //
 #include "Sender.h"
-#define port 8888
-#define IP "127.0.0.1"
 
 int main(){
-    printf("a");
+    printf("a"); // check
+    printf("ddgh");
     FILE * fPointer;
     fPointer = fopen( "2mb_file.txt","r");
     struct stat st;
     stat("2mb_file.txt", &st);
-    int size = st.st_size;
-    //assuming that the size is even (NEED TO CHECK FOR ODD)
+    int size = (int)st.st_size;
+    char allFIle [size];
     int halfSize = size/2;
     char firstHalf[halfSize];
-    fgets(firstHalf, halfSize ,fPointer);
+    fgets(allFIle, size ,fPointer);
+    int index = 0;
+    for(int i = 0; i < halfSize; i++){
+        firstHalf[index] = allFIle[index];
+        index++;
+    }
     int seconedHalfSize = halfSize;
     if(size % 2 == 1) {
         seconedHalfSize++;
     }
-        char secondHalf[seconedHalfSize];
-        fgets(secondHalf, seconedHalfSize, fPointer + halfSize);
+    char secondHalf[seconedHalfSize];
+    for(int i = 0; i < halfSize; i++){
+        secondHalf[index] = allFIle[index];
+        index++;
+    }
+    //fgets(secondHalf, seconedHalfSize, fPointer + halfSize); //illegal!!!!!!!!!
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1) {
@@ -40,25 +48,25 @@ int main(){
     if(connectCheck == -1){
         printf("connect() failed");
     }
-    char CC[10] ="reno";
-    int lenCC = strlen(CC);
-    int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, lenCC );
-    if(checkSSO == -1){
-        printf("setsockopt() failed");
-    }
-// authentication check
-//
-//
     char again = 'y';
     while (again == 'y' || again == 'Y') {
+        char CC[10] ="reno";
+        int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) );
+        if(checkSSO == -1){
+            printf("setsockopt() failed");
+        }
+        //send the first part:
+        if(send(sock, firstHalf, halfSize, 0) == -1){
+            printf("error in send()");
+        }
 
-        send(sock, firstHalf, halfSize, 0);
-//send the first part
-//
+
+//authentication check!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
 //change CC algorithm.
         strcpy(CC, "cubic");
-        lenCC = strlen(CC);
-        int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, lenCC);
+        printf("2\n");
+        int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, strlen(CC));
         if (checkSSO2 == -1) {
             printf("second setsockopt() failed");
         }
@@ -69,18 +77,22 @@ int main(){
         }
 //
 // do u want to send again?
-        again = '0';
+        again ='0';
         while ((again !='y') &&(again !='Y') && (again !='N') &&(again !='n')  ) {
-            printf("do u want to send again? (y/n)");
-            scanf("%c", &again);
+            printf("do u want to send again? (y/n)\n");
+            if( scanf("%c", &again) != 1){
+                printf("error in scanf()");
+            }
+
         }
     }
  //send exit message ????????????????
-    send(sock, "exit message",13,0);
+    printf("sending exit massage");
+    send(sock, "",1,0);
 //close tcp connection:
-    printf("closing connection...");
+    printf("closing connection...\n");
     close(sock);
-    printf("connection closed");
+    printf("connection closed\n");
 //close the file
     fclose(fPointer);
 }

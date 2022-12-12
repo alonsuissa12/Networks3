@@ -12,6 +12,11 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdio.h>
+#include <time.h>
+#include <sys/stat.h>
+#include <netinet/tcp.h>
+#define port 8888
+#define IP "127.0.0.1"
 
 #define TCP_RECEIVER_H
 

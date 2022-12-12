@@ -14,6 +14,8 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <sys/stat.h>
+#define port 8888
+#define IP "127.0.0.1"
 #define TCP_SENDER_H
 
 #endif //TCP_SENDER_H

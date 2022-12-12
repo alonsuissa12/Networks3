@@ -1,6 +1,6 @@
 # Makefile for TCP project
 
-all: Receiver.exe Sender.exe
+all: Receiver.o Sender.o
 clean:
 	rm -f *.exe *.o
 
@@ -9,7 +9,7 @@ clean:
 Receiver.o:Receiver.c Receiver.h
 	gcc Receiver.c -o Receiver.o
 Sender.o: Sender.c Sender.h
-	gcc  Sender.c -o Sender.o
+	gcc  -Wall Sender.c -o Sender.o
 runs: Sender.o
 	./Sender.o
 runr: Receiver.o
