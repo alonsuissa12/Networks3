@@ -78,14 +78,15 @@ int main() {
         TN n;
         n.time = measureTime;
         n.next = NULL;
-        printf("1# n.time is: %f\n" , n.time);
         lastNodePart1->next = &n;
         lastNodePart1 = &n;
         printf("2# n.time is: %f\n" , n.time);
         //********************send back authentication:**********************
         //
-        int x = 7351^4015;
-        int sending = send(sock, &x, sizeof(x), 0);
+        int x = (7351^4015);
+        if((int)(send(senderSock, &x, sizeof(x) - 1, 0)) == -1){
+           printf("error in send()");
+        }
         //the sender receive the authentication and check if its right.
         //
         //*********************^to be completed^*****************************
