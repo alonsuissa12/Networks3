@@ -2,6 +2,7 @@
 // Created by alon on 12/7/22.
 //
 #include "Sender.h"
+#define chank 50000
 
 int main(){
     FILE * fPointer;
@@ -54,7 +55,7 @@ int main(){
             printf("setsockopt() failed");
         }
         //send the first part:
-        if(send(sock, firstHalf, halfSize, 0) == -1){
+        if(send(sock, firstHalf, chank, 0) == -1){
             printf("error in send()");
         }
 
@@ -69,7 +70,7 @@ int main(){
         }
 //
 //send the second part
-        if( send(sock, secondHalf, seconedHalfSize, 0) == -1){
+        if( send(sock, secondHalf, chank, 0) == -1){
             printf("send() failed");
         }
 //
@@ -80,7 +81,6 @@ int main(){
             if( scanf("%c", &again) != 1){
                 printf("error in scanf()");
             }
-
         }
     }
  //send exit message ????????????????

@@ -4,6 +4,7 @@
 
 #include "Receiver.h"
 #define FILE_SIZE 2167736
+#define chank 50000
 int main() {
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in senderAddress;
@@ -23,21 +24,22 @@ int main() {
         printf("error in listen()");
     }
 
-     struct timeNode{
+     typedef struct timeNode{
         double time;
         struct timeNode  *next;
-    } ;
+    } TN;
     //the first node is a Demo node
-    struct timeNode firstNodePart1;
+    TN firstNodePart1;
     firstNodePart1.time =0.0;
     firstNodePart1.next = NULL;
-    struct timeNode firstNodePart2;
+    TN firstNodePart2;
     firstNodePart1.time =0.0;
     firstNodePart1.next = NULL;
-    struct timeNode* lastNodePart1 = &firstNodePart1;
-    struct timeNode* lastNodePart2 = &firstNodePart2;
-    char MsgFirstHalf[FILE_SIZE / 2] = { '0'};
-    char MsgSecondHalf[(FILE_SIZE / 2) + 1] = { '0'};
+    TN* lastNodePart1 = &firstNodePart1;
+    TN* lastNodePart2 = &firstNodePart2;
+    char MsgFirstHalf[FILE_SIZE / 2 ] = { '0'};
+    char MsgSecondHalf[(FILE_SIZE / 2) ] = { '0'};
+    char buffer = '0'; //???
     while(1) {
         memset(&senderAddress, 0, sizeof(senderAddress));
         unsigned int senderAddressLen = sizeof(senderAddress);
@@ -53,33 +55,44 @@ int main() {
         int got = 0;
         int bytes = 0;
         while (got <= FILE_SIZE / 2) {
-            bytes = (int)(recv(senderSock, MsgFirstHalf,(FILE_SIZE/2), 0));
+            bytes = (int)(recv(senderSock, MsgFirstHalf + got,chank, 0));
+            printf("got1: %d\n", bytes);
             if(bytes == -1){
                 printf("error in recv()");
             }
-            if(bytes <= 2) {
+            if(bytes < 2) { // to fix
                 break;
             }
-            got = got + bytes;
+             got = got + bytes;
+            printf("got: %d out of %d\n", got , FILE_SIZE/2);
         }
+        printf("done LOP 1\n");
         end = clock();
-        if(bytes <= 2) {
+
+        if(bytes < 2) { // to fix
             break;
         }
+        printf("aaaaaaaaaaaaaaaaaa\n");
         double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
         //save the time:
-        struct timeNode n;
+        TN n;
         n.time = measureTime;
         n.next = NULL;
+        printf("1# n.time is: %f\n" , n.time);
         lastNodePart1->next = &n;
         lastNodePart1 = &n;
+        printf("2# n.time is: %f\n" , n.time);
         //********************send back authentication:**********************
         char CC[6] ="reno";
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1){
             printf("setsockopt() failed");
         }
         //
-        //*********************to be compleated******************
+        //xor of id
+        //send to sender
+        //the sender receive the authentication and check if its right.
+        //
+        //*********************^to be completed^*****************************
         //
         //
         //change CC Algorithm:
@@ -90,16 +103,14 @@ int main() {
         //receive the second part + measure the time of second part
         start = clock();
         got = 0;
-        int add = 0;
-        if(FILE_SIZE % 2 == 1){
-            add ++;
-        }
-        while (got <= (FILE_SIZE / 2) + add) {
-            bytes = (int)(recv(senderSock, MsgSecondHalf,(FILE_SIZE/2) + 1, 0));
+
+        while (got <= (FILE_SIZE / 2) ) {
+            bytes = (int)(recv(senderSock, MsgSecondHalf + got,chank , 0));
             if(bytes == -1){
                 printf("error in recv()");
+                break;
             }
-            if( bytes <=2) {
+            if( bytes <2) {
                 break;
             }
             got = got + bytes;
@@ -109,6 +120,7 @@ int main() {
             break;
         }
         //save the time
+        measureTime =(double) (end - start)/CLOCKS_PER_SEC;
         lastNodePart2->next = &n;
         n.time =measureTime;
         n.next = NULL;
@@ -123,10 +135,10 @@ int main() {
     int index2 = 1;
     double sum1 = 0;
     double sum2 = 0;
-    struct timeNode * Pnode = firstNodePart1.next;
+    TN * Pnode = firstNodePart1.next;
     while(Pnode != 0){
         double time = (Pnode->time);
-        sum1 = sum1 +time;
+        sum1 = sum1 + time;
         printf("time of first part , of Packet %d is: %f \n" , index1 , time);
         Pnode = Pnode->next;
     }
