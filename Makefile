@@ -2,7 +2,7 @@
 
 all: Receiver Sender
 clean:
-	rm -f *.exe *.o
+	rm -f *.exe *.o Receiver Sender
 
 .PHONEY: all clean
 
