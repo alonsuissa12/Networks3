@@ -33,38 +33,39 @@ int main() {
     firstNodePart1.time =0.0;
     firstNodePart1.next = NULL;
     TN firstNodePart2;
-    firstNodePart1.time =0.0;
-    firstNodePart1.next = NULL;
+    firstNodePart2.time =0.0;
+    firstNodePart2.next = NULL;
     TN* lastNodePart1 = &firstNodePart1;
     TN* lastNodePart2 = &firstNodePart2;
-    char MsgFirstHalf[FILE_SIZE / 2 ] = { '0'};
-    char MsgSecondHalf[(FILE_SIZE / 2) ] = { '0'};
-    char buffer = '0'; //???
+    char MsgBuffer[chank] = { '0'};
+
+    memset(&senderAddress, 0, sizeof(senderAddress));
+    unsigned int senderAddressLen = sizeof(senderAddress);
+    int senderSock = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
+    if (senderSock == -1) {
+        printf("accept() failed");
+        close(sock);
+        return -1;
+    }
     while(1) {
-        memset(&senderAddress, 0, sizeof(senderAddress));
-        unsigned int senderAddressLen = sizeof(senderAddress);
-        int senderSock = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
-        if (senderSock == -1) {
-            printf("accept() failed");
-            close(sock);
-            return -1;
-        }
-        //receive the second part + measure the time of second part:
+        //receive the first part + measure the time of first part:
         clock_t start , end;
         start = clock();
         int got = 0;
         int bytes = 0;
-        while (got <= FILE_SIZE / 2) {
-            bytes = (int)(recv(senderSock, MsgFirstHalf + got,chank, 0));
-            printf("got1: %d\n", bytes);
+        while (got < FILE_SIZE / 2) {
+            bytes = (int)(recv(senderSock, MsgBuffer,FILE_SIZE/2, 0));
+            printf("got now: %d\n", bytes);
             if(bytes == -1){
                 printf("error in recv()");
+                return -1;
             }
             if(bytes < 2) { // to fix
+                printf("break");
                 break;
             }
-             got = got + bytes;
-            printf("got: %d out of %d\n", got , FILE_SIZE/2);
+             got += bytes;
+            printf("all i got: %d out of %d\n", got , FILE_SIZE/2);
         }
         printf("done LOP 1\n");
         end = clock();
@@ -72,7 +73,6 @@ int main() {
         if(bytes < 2) { // to fix
             break;
         }
-        printf("aaaaaaaaaaaaaaaaaa\n");
         double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
         //save the time:
         TN n;
@@ -83,10 +83,6 @@ int main() {
         lastNodePart1 = &n;
         printf("2# n.time is: %f\n" , n.time);
         //********************send back authentication:**********************
-        char CC[6] ="reno";
-        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1){
-            printf("setsockopt() failed");
-        }
         //
         //xor of id
         //send to sender
@@ -96,8 +92,8 @@ int main() {
         //
         //
         //change CC Algorithm:
-        strcpy(CC , "cubic");
-        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) ) == -1) {
+
+        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
             printf("setsockopt() failed");
         }
         //receive the second part + measure the time of second part
@@ -105,10 +101,10 @@ int main() {
         got = 0;
 
         while (got <= (FILE_SIZE / 2) ) {
-            bytes = (int)(recv(senderSock, MsgSecondHalf + got,chank , 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,chank , 0));
             if(bytes == -1){
                 printf("error in recv()");
-                break;
+                return -1;
             }
             if( bytes <2) {
                 break;
@@ -120,37 +116,41 @@ int main() {
             break;
         }
         //save the time
+        TN n2;
         measureTime =(double) (end - start)/CLOCKS_PER_SEC;
-        lastNodePart2->next = &n;
-        n.time =measureTime;
-        n.next = NULL;
-        lastNodePart2 = &n;
+        n2.time =measureTime;
+        n2.next = NULL;
+        lastNodePart2->next = &n2;
+        lastNodePart2 = &n2;
         //if get exit message:
             //print times
             //print avrg time of first part
-            //print avvrg time of secind part
-            // brake;
+            //print avrg time of second part
+
     }
-    int index1 = 1;
-    int index2 = 1;
+    int index1 = 0;
+    int index2 = 0;
     double sum1 = 0;
     double sum2 = 0;
     TN * Pnode = firstNodePart1.next;
     while(Pnode != 0){
+        index1++;
         double time = (Pnode->time);
         sum1 = sum1 + time;
         printf("time of first part , of Packet %d is: %f \n" , index1 , time);
         Pnode = Pnode->next;
     }
-    double avg = sum1 / index1 ;
-    printf("the average of first part is: %f\n" , avg);
+
     Pnode = firstNodePart2.next;
     while(Pnode != 0) {
+        index2++;
         double time = (Pnode->time);
         sum2 = sum2 + time;
-        printf("time of second part , of Packet %d is: %f \n", index1, time);
+        printf("time of second part , of Packet %d is: %f \n", index2, time);
         Pnode = Pnode->next;
     }
+    double avg = sum1 / index1 ;
+    printf("the average of first part is: %f\n" , avg);
     avg = sum2 / index2 ;
     printf("the average of second part is: %f\n" , avg);
 return 0;

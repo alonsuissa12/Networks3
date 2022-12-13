@@ -19,16 +19,11 @@ int main(){
         firstHalf[index] = allFIle[index];
         index++;
     }
-    int seconedHalfSize = halfSize;
-    if(size % 2 == 1) {
-        seconedHalfSize++;
-    }
-    char secondHalf[seconedHalfSize];
+    char secondHalf[halfSize];
     for(int i = 0; i < halfSize; i++){
         secondHalf[index] = allFIle[index];
         index++;
     }
-    //fgets(secondHalf, seconedHalfSize, fPointer + halfSize); //illegal!!!!!!!!!
 
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1) {
@@ -39,7 +34,7 @@ int main(){
     receiver_adderess.sin_family = AF_INET;
     receiver_adderess.sin_port = htons(port);
     int checkP = inet_pton(AF_INET,(const char*)IP,&receiver_adderess.sin_addr);
-    if(checkP <= 0){
+    if(checkP < 0){
         printf("inet_pton() failed");
     }
 
@@ -55,7 +50,7 @@ int main(){
             printf("setsockopt() failed");
         }
         //send the first part:
-        if(send(sock, firstHalf, chank, 0) == -1){
+        if(send(sock, firstHalf, sizeof (firstHalf), 0) == -1){
             printf("error in send()");
         }
 
@@ -80,6 +75,7 @@ int main(){
             printf("do u want to send again? (y/n)\n");
             if( scanf("%c", &again) != 1){
                 printf("error in scanf()");
+
             }
         }
     }
