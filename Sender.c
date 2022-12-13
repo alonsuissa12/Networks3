@@ -56,6 +56,15 @@ int main(){
 
 
 //authentication check!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        int gotX;
+        recv(sock, &gotX, sizeof(gotX),0);
+        if(gotX == 7351^4015){
+            printf("GOOD!\n");
+        }
+        else{
+            printf("BAD!\n");
+        }
+
 
 //change CC algorithm.
         strcpy(CC, "cubic");

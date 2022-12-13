@@ -54,7 +54,7 @@ int main() {
         int got = 0;
         int bytes = 0;
         while (got < FILE_SIZE / 2) {
-            bytes = (int)(recv(senderSock, MsgBuffer,FILE_SIZE/2, 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,chank, 0));
             printf("got now: %d\n", bytes);
             if(bytes == -1){
                 printf("error in recv()");
@@ -84,15 +84,15 @@ int main() {
         printf("2# n.time is: %f\n" , n.time);
         //********************send back authentication:**********************
         //
-        //xor of id
-        //send to sender
+        int x = 7351^4015;
+        int sending = send(sock, &x, sizeof(x), 0);
         //the sender receive the authentication and check if its right.
         //
         //*********************^to be completed^*****************************
         //
         //
         //change CC Algorithm:
-
+        printf("abc");
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
             printf("setsockopt() failed");
         }
@@ -102,6 +102,7 @@ int main() {
 
         while (got <= (FILE_SIZE / 2) ) {
             bytes = (int)(recv(senderSock, MsgBuffer,chank , 0));
+            printf("got now: %d\n", bytes);
             if(bytes == -1){
                 printf("error in recv()");
                 return -1;
@@ -109,7 +110,8 @@ int main() {
             if( bytes <2) {
                 break;
             }
-            got = got + bytes;
+            got += bytes;
+            printf("all i got: %d out of %d\n", got , FILE_SIZE/2);
         }
         end = clock();
         if(bytes < 2 ) {
