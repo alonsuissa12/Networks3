@@ -90,12 +90,18 @@ int main() {
     }
     while(1){
         //Receive the first part + measure the time of first part:
-        clock_t start , end;
-        start = clock();
+        struct timeval start , end;
+//        clock_t start , end;
+//        start = clock();
         int got = 0;
+        int isTimeStarted = 0;
         int bytes = 0;
         while (got < FILE_SIZE/2){
             bytes = (int)(recv(senderSock, MsgBuffer,CHANK, 0));
+            if(! isTimeStarted){
+                gettimeofday(&start,NULL);
+                isTimeStarted = 1;
+            }
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
@@ -107,12 +113,14 @@ int main() {
             }
              got += bytes;
         }
-        end = clock();
-
+        isTimeStarted = 0;
+        gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
-        double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
+        double sec = (double )(end.tv_sec - start.tv_sec);
+        double usec =(double )(end.tv_usec - start.tv_usec);
+        double measureTime = sec + (usec / 1000000);
         //Save the time:
         TN *node1;
         node1 = createNewNode(measureTime);
@@ -132,12 +140,15 @@ int main() {
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
             printf("setsockopt() failed.\n");
         }
-        start = clock();
         got = 0;
 
         //Receive the second part + measure the time of second part.
         while (got < FILE_SIZE / 2){
             bytes = (int)(recv(senderSock, MsgBuffer,CHANK , 0));
+            if(! isTimeStarted){
+                isTimeStarted = 1;
+                gettimeofday(&start,NULL);
+            }
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
@@ -149,12 +160,14 @@ int main() {
             }
             got += bytes;
         }
-        end = clock();
+        gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
         //Saving the time.
-        measureTime =(double) (end - start)/CLOCKS_PER_SEC;
+         sec = (double )(end.tv_sec - start.tv_sec);
+         usec =(double )(end.tv_usec - start.tv_usec);
+         measureTime = sec + (usec / 1000000);
 
         TN *node2;
         node2 = createNewNode(measureTime);
@@ -174,7 +187,7 @@ int main() {
     double sum1 = 0;
     double sum2 = 0;
     
-    headNodePart2 = reverse(headNodePart2);
+    headNodePart1 = reverse(headNodePart1);
     index_sum1 = printPacketTime(headNodePart1, index1, sum1, 0, 1);
     index1 = index_sum1[0];
     sum1 = index_sum1[1];
@@ -189,10 +202,10 @@ int main() {
     printf("\n");
 
     double avg = (sum1 / index1);
-    printf("The average of first part is: %f\n" , avg);
+    printf("The average of first part 1 is: %f\n" , avg);
     
     avg = (sum2 / index2);
-    printf("The average of second part is: %f\n" , avg);
+    printf("The average of second part 2 is: %f\n" , avg);
     
     return 0;
 }

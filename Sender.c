@@ -48,6 +48,7 @@ int main(){
         }
 
         //Sending the first part:
+        printf("Sending file...\n");
         if(send(sock, firstHalf, sizeof(firstHalf), 0) == -1){
             printf("Error in send().\n");
         }
@@ -78,12 +79,38 @@ int main(){
         while(1){
             printf("Do u want to send again? (y/n)\n");
             if(scanf(" %c", &again) != 1){
-                printf("Scaning FAILED!.\n");
+                printf("Scanning FAILED!.\n");
             }
-            if((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
+            while((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                 printf("Please enter (y/n).\n");
+                scanf(" %c", &again);
             }
-            else{
+            if( again == 'n' || again == 'N') {
+                printf("Do you want to exit? (y/n)\n");
+                if (scanf(" %c", &again) != 1) {
+                    printf("Scanning FAILED!.\n");
+                }
+                while ((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
+                    printf("Please enter (y/n).\n");
+                    if(scanf(" %c", &again) != 1) {
+                        printf("Scanning FAILED!.\n");
+                    }
+                }
+                if (again == 'y' || again == 'Y') {
+                    printf("Sending exit massage.\n");
+                    send(sock, "I want to exit NOW!!!! thanks :)", 34, 0);
+
+                    //Closing TCP connection:
+                    printf("Closing connection...\n");
+                    close(sock);
+                    printf("Connection closed.\n");
+
+                    //Closing the file.
+                    fclose(fPointer);
+                    return 0;
+                }
+            }
+            else {
                 break;
             }
         }

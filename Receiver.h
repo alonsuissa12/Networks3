@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 #include <stdio.h>
-#include <time.h>
+#include <sys/time.h>
 #include <sys/stat.h>
 #include <netinet/tcp.h>
 #define port 8888
