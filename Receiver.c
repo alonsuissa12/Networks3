@@ -1,6 +1,7 @@
 #include "Receiver.h"
 #define FILE_SIZE 2167736
-#define chank 50000
+#define CHANK 50000
+#define EXIT "I want to exit NOW!!!! thanks :)"
 
 struct timeNode{
     double time;
@@ -94,19 +95,21 @@ int main() {
         int got = 0;
         int bytes = 0;
         while (got < FILE_SIZE/2){
-            bytes = (int)(recv(senderSock, MsgBuffer,chank, 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,CHANK, 0));
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
             }
-            if(bytes < 2){ 
+  
+            if(!(strcmp(EXIT, MsgBuffer))){ 
+                printf("Exit message received: '%s'\n\n", MsgBuffer);
                 break;
             }
              got += bytes;
         }
         end = clock();
 
-        if(bytes < 2){
+        if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
         double measureTime =(double) (end - start)/CLOCKS_PER_SEC;
@@ -118,25 +121,12 @@ int main() {
 
         //********************Send back authentication:**********************
 
-        int x = 7351^4015;
+        int x = (7351^4015);
         if((int)(send(senderSock, &x, sizeof(x) - 1, 0)) == -1){
            printf("Error in send().\n");
         }
 
-        //The sender receive the authentication and send back a message if its right.
-        printf("Receive the check.\n");
-        bytes = (int)(recv(senderSock, MsgBuffer,chank, 0));
-        if(bytes == -1){
-            printf("Error in recv().\n");
-            return -1;
-        }
-        if(bytes < 10){
-            printf("Authentication faild.\n");
-            break;
-        }
-        else{
-            printf("bytes = %d\n", bytes);
-        }
+        //The sender receive the authentication and check if it's right.
 
         //Change CC Algorithm:
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
@@ -147,18 +137,20 @@ int main() {
 
         //Receive the second part + measure the time of second part.
         while (got < FILE_SIZE / 2){
-            bytes = (int)(recv(senderSock, MsgBuffer,chank , 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,CHANK , 0));
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
             }
-            if( bytes < 2) {
+
+            if(!(strcmp(EXIT, MsgBuffer))){ 
+                printf("Exit message received: '%s'\n\n", MsgBuffer);
                 break;
             }
             got += bytes;
         }
         end = clock();
-        if(bytes < 2 ) {
+        if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
         //Saving the time.
@@ -181,9 +173,7 @@ int main() {
     double index2;
     double sum1 = 0;
     double sum2 = 0;
-
     
-    headNodePart1 = headNodePart1->next;
     headNodePart2 = reverse(headNodePart2);
     index_sum1 = printPacketTime(headNodePart1, index1, sum1, 0, 1);
     index1 = index_sum1[0];
@@ -191,7 +181,6 @@ int main() {
 
     printf("\n");
 
-    headNodePart2 = headNodePart2->next;
     headNodePart2 = reverse(headNodePart2);
     index_sum2 = printPacketTime(headNodePart2, index2, sum2, 0, 2);
     index2 = index_sum2[0];

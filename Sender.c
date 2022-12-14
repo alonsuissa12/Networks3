@@ -32,23 +32,23 @@ int main(){
     receiver_adderess.sin_port = htons(port);
     int checkP = inet_pton(AF_INET,(const char*)IP,&receiver_adderess.sin_addr);
     if(checkP < 0){
-        printf("inet_pton() failed.\n");
+        printf("inet_pton() FAILED.\n");
     }
 
     int connectCheck = connect(sock,(struct sockaddr*) &receiver_adderess,sizeof(receiver_adderess));
     if(connectCheck == -1){
-        printf("connect() failed.\n");
+        printf("connect() FAILED.\n");
     }
     char again = 'y';
     while (again == 'y' || again == 'Y') {
         char CC[7] ="reno";
         int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) );
         if(checkSSO == -1){
-            printf("setsockopt() failed.\n");
+            printf("setsockopt() FAILED.\n");
         }
 
         //Sending the first part:
-        if(send(sock, firstHalf, sizeof (firstHalf), 0) == -1){
+        if(send(sock, firstHalf, sizeof(firstHalf), 0) == -1){
             printf("Error in send().\n");
         }
 
@@ -56,36 +56,29 @@ int main(){
         //Authentication check:
         int gotX;
         recv(sock, &gotX, sizeof(gotX),0);
-        if(gotX != 7351^4015){
-            const char authenticationFail[] = "BAD";
-            if(send(sock, authenticationFail, sizeof (authenticationFail), 0) == -1){
-               printf("Error in send().\n");
-            }
+        if(gotX != (7351^4015)){
+            printf("Authentication FAILED.\n");
+            break;
         }
-        else{
-            const char authenticationSuccess[] = "Very good you passed the authentication check";
-            if(send(sock, authenticationSuccess, sizeof (authenticationSuccess), 0) == -1){
-               printf("Error in send().\n");
-            }            
-        }
+
 
         //Changing the CC algorithm.
         strcpy(CC, "cubic");
         int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, strlen(CC));
         if(checkSSO2 == -1) {
-            printf("Second setsockopt() failed.\n");
+            printf("Second setsockopt() FAILED.\n");
         }
 
         //Sending the second part:
         if(send(sock, secondHalf, sizeof(secondHalf), 0) == -1){
-            printf("send() failed.\n");
+            printf("send() FAILED.\n");
         }
 
         //Do u want to send again?
         while(1){
             printf("Do u want to send again? (y/n)\n");
             if(scanf(" %c", &again) != 1){
-                printf("Scaning faild!.\n");
+                printf("Scaning FAILED!.\n");
             }
             if((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                 printf("Please enter (y/n).\n");
@@ -98,7 +91,7 @@ int main(){
 
     //Sending exit message:
     printf("Sending exit massage.\n");
-    send(sock, "",1,0);
+    send(sock, "I want to exit NOW!!!! thanks :)",34,0);
 
     //Closing TCP connection:
     printf("Closing connection...\n");
