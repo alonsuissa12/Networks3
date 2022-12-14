@@ -1,7 +1,3 @@
-//
-// Created by alon on 12/7/22.
-//
-
 #ifndef TCP_SENDER_H
 #include <stdlib.h>
 #include <errno.h>
