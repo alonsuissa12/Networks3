@@ -1,5 +1,5 @@
 #include "Receiver.h"
-#define FILE_SIZE 2167736
+#define FILE_SIZE 1048575
 #define CHANK 50000
 #define EXIT "I want to exit NOW!!!! thanks :)"
 
@@ -202,10 +202,10 @@ int main() {
     printf("\n");
 
     double avg = (sum1 / index1);
-    printf("The average of first part 1 is: %f\n" , avg);
+    printf("The average of the first part is: %f\n" , avg);
     
     avg = (sum2 / index2);
-    printf("The average of second part 2 is: %f\n" , avg);
+    printf("The average of the second part is: %f\n" , avg);
     
     return 0;
 }

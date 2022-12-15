@@ -3,9 +3,9 @@
 
 int main(){
     FILE * fPointer;
-    fPointer = fopen( "2mb_file.txt","r");
+    fPointer = fopen( "1mb_file.txt","r");
     struct stat st;
-    stat("2mb_file.txt", &st);
+    stat("1mb_file.txt", &st);
     int size = (int)st.st_size;
     char allFIle [size];
     int halfSize = size/2;
