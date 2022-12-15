@@ -13,7 +13,9 @@
 #include <netinet/tcp.h>
 #define port 8888
 #define IP "127.0.0.1"
-
+#define FILE_SIZE 1048574
+#define CHANK 50000
+#define EXIT "I want to exit NOW!!!! thanks :)"
 #define TCP_RECEIVER_H
 
 #endif //TCP_RECEIVER_H
