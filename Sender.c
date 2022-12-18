@@ -34,25 +34,31 @@ int main(){
     receiver_adderess.sin_family = AF_INET;
     receiver_adderess.sin_port = htons(port);
     int checkP = inet_pton(AF_INET,(const char*)IP,&receiver_adderess.sin_addr);
+    
     if(checkP < 0){
         printf("inet_pton() FAILED.\n");
     }
+    
     //connecting to the Receiver on the socket
     int connectCheck = connect(sock,(struct sockaddr*) &receiver_adderess,sizeof(receiver_adderess));
+    
     if(connectCheck == -1){
         printf("connect() FAILED.\n");
     }
+    
     char again = 'y';
     while (again == 'y' || again == 'Y') {
         //chang CC algorithm to 'reno'
         char CC[7] ="reno";
         int checkSSO = setsockopt(sock,IPPROTO_TCP,TCP_CONGESTION,CC, strlen(CC) );
+        
         if(checkSSO == -1){
             printf("setsockopt() FAILED.\n");
         }
 
         //Sending the first part of the file.
         printf("Sending file...\n");
+        
         if(send(sock, firstHalf, sizeof(firstHalf), 0) == -1){
             printf("Error in send().\n");
         }
@@ -60,6 +66,7 @@ int main(){
         //Authentication check.
         int gotX;
         recv(sock, &gotX, sizeof(gotX),0);
+        
         if(gotX != (7351^4015)){
             printf("Authentication FAILED.\n");
             break;
@@ -68,6 +75,7 @@ int main(){
         //Changing the CC algorithm to 'cubic'.
         strcpy(CC, "cubic");
         int checkSSO2 = setsockopt(sock, IPPROTO_TCP, TCP_CONGESTION, CC, strlen(CC));
+        
         if(checkSSO2 == -1) {
             printf("Second setsockopt() FAILED.\n");
         }
@@ -80,26 +88,35 @@ int main(){
         //User decision: sending the file again or exit (have to chose one of them).
         while(1){
             printf("Do u want to send again? (y/n)\n");
+            
             if(scanf(" %c", &again) != 1){
                 printf("Scanning FAILED!.\n");
             }
+
             //checking for proper input
             while((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                 printf("Please enter (y/n).\n");
-                scanf(" %c", &again);
+                
+                if(scanf(" %c", &again) != 1) {
+                    printf("Scanning FAILED!.\n");
+                }          
             }
+
             if( again == 'n' || again == 'N') {
                 printf("Do you want to exit? (y/n)\n");
                 if (scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
                 }
+                
                 //checking for proper input
                 while ((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                     printf("Please enter (y/n).\n");
+                    
                     if(scanf(" %c", &again) != 1) {
                         printf("Scanning FAILED!.\n");
                     }
                 }
+
                 if (again == 'y' || again == 'Y') {
                     printf("Sending exit massage.\n");
                     send(sock, "I want to exit NOW!!!! thanks :)", 34, 0);
@@ -114,6 +131,7 @@ int main(){
                     return 0;
                 }
             }
+
             else {
                 break;
             }
