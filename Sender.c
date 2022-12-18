@@ -96,7 +96,7 @@ int main(){
             //checking for proper input
             while((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                 printf("Please enter (y/n).\n");
-                
+                fflush(stdin);
                 if(scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
                 }          
@@ -111,7 +111,7 @@ int main(){
                 //checking for proper input
                 while ((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                     printf("Please enter (y/n).\n");
-                    
+                    fflush(stdin);
                     if(scanf(" %c", &again) != 1) {
                         printf("Scanning FAILED!.\n");
                     }
