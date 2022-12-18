@@ -92,7 +92,7 @@ int main() {
         int isTimeStarted = 0;
         int bytes = 0;
         while (got < FILE_SIZE/2){
-            bytes = (int)(recv(senderSock, MsgBuffer,CHANK, 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,CHUNK, 0));
             //starts measuring the time on the first time.
             if(! isTimeStarted){
                 gettimeofday(&start,NULL);
@@ -136,7 +136,7 @@ int main() {
         //Receive the second part + measure the time of second part.
         got = 0;
         while (got < FILE_SIZE / 2){
-            bytes = (int)(recv(senderSock, MsgBuffer,CHANK , 0));
+            bytes = (int)(recv(senderSock, MsgBuffer,CHUNK , 0));
             if(! isTimeStarted){
                 isTimeStarted = 1;
                 gettimeofday(&start,NULL);
