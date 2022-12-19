@@ -176,6 +176,7 @@ int main() {
     headNodePart1 = reverse(headNodePart1);
     //Printing th times of the first part.
     //'index_sum1' will point to array the holds the sum of the times and the length of the list
+    printf("times of first part(sent with reno algorithm):\n");
     index_sum1 = printPacketTime(headNodePart1, index1, sum1, 0, 1);
     index1 = index_sum1[0];
     sum1 = index_sum1[1];
@@ -186,6 +187,7 @@ int main() {
     headNodePart2 = reverse(headNodePart2);
     //Printing th times of the first part.
     //'index_sum2' will point to array the holds the sum of the times and the length of the list
+    printf("times of second part(sent with cubic algorithm):\n");
     index_sum2 = printPacketTime(headNodePart2, index2, sum2, 0, 2);
     index2 = index_sum2[0];
     sum2 = index_sum2[1];
@@ -193,10 +195,10 @@ int main() {
     printf("\n");
     //Printing out the average time of the first part.
     double avg = (sum1 / index1);
-    printf("The average of the first part is: %f\n" , avg);
+    printf("The average of the first part (sent with reno CC algorithm) is: %f\n" , avg);
     //Printing out the average time of the second part.
     avg = (sum2 / index2);
-    printf("The average of the second part is: %f\n" , avg);
+    printf("The average of the second part (sent with cubic CC algorithm) is: %f\n" , avg);
     
     return 0;
 }
