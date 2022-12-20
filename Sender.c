@@ -1,34 +1,41 @@
 #include "Sender.h"
 
 int main(){
+
     //A pointer to a file.
     FILE * fPointer;
+
     //The pointer get the address of the file and get permition to read from it
     fPointer = fopen( "1mb_file.txt","r");
 
     char allFIle [FILE_SIZE];
     int halfSize = FILE_SIZE/2;
     char firstHalf[halfSize];
+    char secondHalf[halfSize];
+    int index = 0;
+
     //reading the file into 'allFile' array.
     fgets(allFIle, FILE_SIZE ,fPointer);
-    int index = 0;
+
     //copping the first part of the array into 'firstHalf' array
     for(int i = 0; i < halfSize; i++){
         firstHalf[index] = allFIle[index];
         index++;
     }
-    char secondHalf[halfSize];
+
     //copping the second part of the array into 'secondHalf' array
     for(int i = 0; i < halfSize; i++){
         secondHalf[index] = allFIle[index];
         index++;
     }
+
     //initializing a TCP socket.
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1) {
         printf("Could not create socket.\n");
         return -1;
     }
+
     struct sockaddr_in receiver_adderess;
     //setting to zero the struct senderAddress
     memset(&receiver_adderess,0,sizeof(receiver_adderess));
@@ -111,6 +118,7 @@ int main(){
 
             if( again == 'n' || again == 'N') {
                 printf("Do you want to exit? (y/n)\n");
+
                 if (scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
                     return -1;
@@ -120,6 +128,7 @@ int main(){
                 while ((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                     printf("Please enter (y/n).\n");
                     fflush(stdin);
+
                     if(scanf(" %c", &again) != 1) {
                         printf("Scanning FAILED!.\n");
                         return -1;
@@ -128,6 +137,7 @@ int main(){
 
                 if (again == 'y' || again == 'Y') {
                     printf("Sending exit massage.\n");
+
                     if(send(sock, "I want to exit NOW!!!! thanks :)", 34, 0) == -1){
                         printf("send() failed;");
                         return -1;
