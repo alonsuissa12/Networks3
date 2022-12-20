@@ -91,6 +91,10 @@ int main() {
         int got = 0;
         int isTimeStarted = 0;
         int bytes = 0;
+        //Change CC Algorithm.
+        if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"reno", 5) == -1) {
+            printf("setsockopt() failed.\n");
+        }
         while (got < FILE_SIZE/2){
             bytes = (int)(recv(senderSock, MsgBuffer,CHUNK, 0));
             //starts measuring the time on the first time.
