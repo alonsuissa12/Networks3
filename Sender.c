@@ -27,6 +27,7 @@ int main(){
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     if(sock == -1) {
         printf("Could not create socket.\n");
+        return -1;
     }
     struct sockaddr_in receiver_adderess;
     //setting to zero the struct senderAddress
@@ -37,6 +38,7 @@ int main(){
     
     if(checkP < 0){
         printf("inet_pton() FAILED.\n");
+        return -1;
     }
     
     //connecting to the Receiver on the socket
@@ -44,6 +46,7 @@ int main(){
     
     if(connectCheck == -1){
         printf("connect() FAILED.\n");
+        return -1;
     }
     
     char again = 'y';
@@ -61,6 +64,7 @@ int main(){
         
         if(send(sock, firstHalf, sizeof(firstHalf), 0) == -1){
             printf("Error in send().\n");
+            return -1;
         }
 
         //Authentication check.
@@ -83,6 +87,7 @@ int main(){
         //Sending the second part.
         if(send(sock, secondHalf, sizeof(secondHalf), 0) == -1){
             printf("send() FAILED.\n");
+            return -1;
         }
 
         //User decision: sending the file again or exit (have to chose one of them).
@@ -91,6 +96,7 @@ int main(){
             
             if(scanf(" %c", &again) != 1){
                 printf("Scanning FAILED!.\n");
+                return -1;
             }
 
             //checking for proper input
@@ -99,6 +105,7 @@ int main(){
                 fflush(stdin);
                 if(scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
+                    return -1;
                 }          
             }
 
@@ -106,6 +113,7 @@ int main(){
                 printf("Do you want to exit? (y/n)\n");
                 if (scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
+                    return -1;
                 }
                 
                 //checking for proper input
@@ -114,12 +122,16 @@ int main(){
                     fflush(stdin);
                     if(scanf(" %c", &again) != 1) {
                         printf("Scanning FAILED!.\n");
+                        return -1;
                     }
                 }
 
                 if (again == 'y' || again == 'Y') {
                     printf("Sending exit massage.\n");
-                    send(sock, "I want to exit NOW!!!! thanks :)", 34, 0);
+                    if(send(sock, "I want to exit NOW!!!! thanks :)", 34, 0) == -1){
+                        printf("send() failed;");
+                        return -1;
+                    }
 
                     //Closing TCP connection.
                     printf("Closing connection...\n");
