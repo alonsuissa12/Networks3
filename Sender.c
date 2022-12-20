@@ -2,17 +2,17 @@
 
 int main(){
 
-    //A pointer to a file.
-    FILE * fPointer;
-
-    //The pointer get the address of the file and get permition to read from it
-    fPointer = fopen( "1mb_file.txt","r");
-
     char allFIle [FILE_SIZE];
     int halfSize = FILE_SIZE/2;
     char firstHalf[halfSize];
     char secondHalf[halfSize];
     int index = 0;
+
+    //A pointer to a file.
+    FILE * fPointer;
+
+    //The pointer get the address of the file and get permition to read from it
+    fPointer = fopen( "1mb_file.txt","r");
 
     //reading the file into 'allFile' array.
     fgets(allFIle, FILE_SIZE ,fPointer);
