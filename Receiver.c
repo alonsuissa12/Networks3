@@ -129,6 +129,10 @@ int main() {
         //Saving the time.
         TN *node1;
         node1 = createNewNode(measureTime);
+        if(node1 == NULL){
+            printf("malloc() failed");
+            return -1;
+        }
         node1->next = headNodePart1;
         headNodePart1 = node1;
         //Sending  authentication.
@@ -170,6 +174,10 @@ int main() {
         //Saving the time.
         TN *node2;
         node2 = createNewNode(measureTime);
+        if(node2 == NULL){
+            printf("malloc() failed");
+            return -1;
+        }
         node2->next = headNodePart2;
         headNodePart2 = node2;
     }
@@ -207,6 +215,19 @@ int main() {
     //Printing out the average time of the second part.
     avg = (sum2 / index2);
     printf("The average of the second part (sent with cubic CC algorithm) is: %f\n" , avg);
-    
+    //free the allocated memory:
+    TN * temp =  headNodePart1;
+    while (temp != NULL) {
+        TN * toFree = temp;
+        temp =  temp->next;
+        free(toFree);
+    }
+    temp =  headNodePart2;
+    while (temp != NULL) {
+        TN * toFree = temp;
+        temp =  temp->next;
+        free(toFree);
+    }
+
     return 0;
 }
