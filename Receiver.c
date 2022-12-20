@@ -58,16 +58,19 @@ int main() {
     int checkP = inet_pton(AF_INET, (const char *) IP, &senderAddress.sin_addr);
     if (checkP <= 0) {
         printf("inet_pton() failed.\n");
+        return -1;
     }
     //opening the socket.
     int Bcheck = bind(sock, (struct sockaddr *) &senderAddress, sizeof(senderAddress));
     if (Bcheck == -1) {
         printf("Error while binding.\n");
+        return -1;
     }
     //start listening on the socket (one client at the time)
     int Lcheck = listen(sock, 1);
     if (Lcheck == -1) {
         printf("Error in listen().\n");
+        return -1;
     }
 
     //First node to start the list (demo node). we hold two lists on for each part.
@@ -132,6 +135,7 @@ int main() {
         int x = (7351^4015);
         if((int)(send(senderSock, &x, sizeof(x) - 1, 0)) == -1){
            printf("Error in send().\n");
+            return -1;
         }
         //Change CC Algorithm.
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
