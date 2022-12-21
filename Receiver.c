@@ -116,16 +116,19 @@ int main() {
             }
              got += bytes;
         }
+        
         isTimeStarted = 0;
         //if got an exit massage.
         gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
+
         //converting the measure time to seconds format (double).
         double sec = (double )(end.tv_sec - start.tv_sec);
         double usec =(double )(end.tv_usec - start.tv_usec);
         double measureTime = sec + (usec / 1000000);
+
         //Saving the time.
         TN *node1;
         node1 = createNewNode(measureTime);
@@ -135,16 +138,19 @@ int main() {
         }
         node1->next = headNodePart1;
         headNodePart1 = node1;
+
         //Sending  authentication.
         int x = (7351^4015);
         if((int)(send(senderSock, &x, sizeof(x) - 1, 0)) == -1){
            printf("Error in send().\n");
             return -1;
         }
+
         //Change CC Algorithm.
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"cubic", 5) == -1) {
             printf("setsockopt() failed.\n");
         }
+
         //Receive the second part + measure the time of second part.
         got = 0;
         while (got < FILE_SIZE / 2){
@@ -171,6 +177,7 @@ int main() {
          sec = (double )(end.tv_sec - start.tv_sec);
          usec =(double )(end.tv_usec - start.tv_usec);
          measureTime = sec + (usec / 1000000);
+
         //Saving the time.
         TN *node2;
         node2 = createNewNode(measureTime);
@@ -181,6 +188,7 @@ int main() {
         node2->next = headNodePart2;
         headNodePart2 = node2;
     }
+
     //this part will start only after getting Exit message.
     double *index_sum1;
     double *index_sum2;
@@ -188,8 +196,10 @@ int main() {
     double index2;
     double sum1 = 0;
     double sum2 = 0;
+
     //Reversing the list because we want the real order that  the packet arrive(we added to the head of the list).
     headNodePart1 = reverse(headNodePart1);
+
     //Printing th times of the first part.
     //'index_sum1' will point to array the holds the sum of the times and the length of the list
     printf("times of first part(sent with reno algorithm):\n");
@@ -201,6 +211,7 @@ int main() {
 
     //Reversing the list because we want the real order that  the packet arrive(we added to the head of the list).
     headNodePart2 = reverse(headNodePart2);
+
     //Printing th times of the first part.
     //'index_sum2' will point to array the holds the sum of the times and the length of the list
     printf("times of second part(sent with cubic algorithm):\n");
@@ -212,6 +223,7 @@ int main() {
     //Printing out the average time of the first part.
     double avg = (sum1 / index1);
     printf("The average of the first part (sent with reno CC algorithm) is: %f\n" , avg);
+    
     //Printing out the average time of the second part.
     avg = (sum2 / index2);
     printf("The average of the second part (sent with cubic CC algorithm) is: %f\n" , avg);
