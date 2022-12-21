@@ -130,9 +130,9 @@ int main() {
         }
         
         isTimeStarted = 0;
+        gettimeofday(&end,NULL);
 
         //if got an exit massage.
-        gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
@@ -188,9 +188,9 @@ int main() {
 
             got += bytes;
         }
+        gettimeofday(&end,NULL);
 
         //if got an exit massage.
-        gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }

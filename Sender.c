@@ -158,17 +158,4 @@ int main(){
             }
         }
     }
-
-    //Sending exit message:
-    printf("Sending exit massage.\n");
-    send(sock, "I want to exit NOW!!!! thanks :)",34,0);
-
-    //Closing TCP connection:
-    printf("Closing connection...\n");
-    close(sock);
-    printf("Connection closed.\n");
-
-    //Closing the file.
-    fclose(fPointer);
-    return 0;
 }
