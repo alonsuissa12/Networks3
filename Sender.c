@@ -172,5 +172,5 @@ int main(){
 
     //Closing the file.
     fclose(fPointer);
-    return 0;
+    return -1;
 }
