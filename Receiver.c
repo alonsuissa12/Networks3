@@ -6,14 +6,15 @@ struct timeNode{
     struct timeNode *next;
 };
 typedef struct timeNode TN;
-//Constructor of timeNode(TN).
+
+//A method to add new timeNode to the LinkedList
 TN *createNewNode(double time){
     TN *result = malloc(sizeof(TN));
     result->time = time;
     result->next = NULL;
     return result;
 }
-//Function which reverse the list 'head'.
+//A method which reverse the list 'head'.
 TN* reverse(TN *head){
     TN *prev = NULL;
     TN *next = NULL;
@@ -26,7 +27,7 @@ TN* reverse(TN *head){
     head = prev;
     return head;
 }
-//Function to print out the times which stashed in the list 'head',and return the length of the list and sum of the times.
+//A method to print out the times which stashed in the list 'head',and return the length of the list and sum of the times.
 double * printPacketTime(TN *head, double index, double sum, double time, int packet){
     static double arr[2];
     TN *temporary = head;
@@ -76,10 +77,12 @@ int main() {
     //First node to start the list (demo node). we hold two lists on for each part.
     TN *headNodePart1;
     TN *headNodePart2;
+
     //Buffer to receive the data from the packets into.
     char MsgBuffer[FILE_SIZE / 2] = {'0'};
     memset(&senderAddress, 0, sizeof(senderAddress));
     unsigned int senderAddressLen = sizeof(senderAddress);
+
     //accepting the client (the Sender)
     int senderSock = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
     if (senderSock == -1) {
@@ -87,37 +90,45 @@ int main() {
         close(sock);
         return -1;
     }
+
     //we will stay in the loop and keep receiving massages until we get an exit massage.
     while(1){
+
         //Receive the first part + measure the time of first part:
         struct timeval start , end;
         int got = 0;
         int isTimeStarted = 0;
         int bytes = 0;
+
         //Change CC Algorithm.
         if(setsockopt(senderSock,IPPROTO_TCP,TCP_CONGESTION,"reno", 5) == -1) {
             printf("setsockopt() failed.\n");
         }
         while (got < FILE_SIZE/2){
             bytes = (int)(recv(senderSock, MsgBuffer,CHUNK, 0));
+
             //starts measuring the time on the first time.
             if(! isTimeStarted){
                 gettimeofday(&start,NULL);
                 isTimeStarted = 1;
             }
+
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
             }
+
             //if got an exit message.
             if(!(strcmp(EXIT, MsgBuffer))){ 
                 printf("Exit message received: '%s'\n\n", MsgBuffer);
                 break;
             }
-             got += bytes;
+            
+            got += bytes;
         }
         
         isTimeStarted = 0;
+
         //if got an exit massage.
         gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
@@ -136,6 +147,7 @@ int main() {
             printf("malloc() failed");
             return -1;
         }
+
         node1->next = headNodePart1;
         headNodePart1 = node1;
 
@@ -154,25 +166,33 @@ int main() {
         //Receive the second part + measure the time of second part.
         got = 0;
         while (got < FILE_SIZE / 2){
+
             bytes = (int)(recv(senderSock, MsgBuffer,CHUNK , 0));
+
             if(! isTimeStarted){
                 isTimeStarted = 1;
                 gettimeofday(&start,NULL);
             }
+
             if(bytes == -1){
                 printf("Error in recv().\n");
                 return -1;
             }
+
             if(!(strcmp(EXIT, MsgBuffer))){ 
                 printf("Exit message received: '%s'\n\n", MsgBuffer);
                 break;
             }
+
             got += bytes;
         }
+
+        //if got an exit massage.
         gettimeofday(&end,NULL);
         if(!(strcmp(EXIT, MsgBuffer))){
             break;
         }
+
         //converting the measure time to seconds format (double).
          sec = (double )(end.tv_sec - start.tv_sec);
          usec =(double )(end.tv_usec - start.tv_usec);
@@ -227,6 +247,7 @@ int main() {
     //Printing out the average time of the second part.
     avg = (sum2 / index2);
     printf("The average of the second part (sent with cubic CC algorithm) is: %f\n" , avg);
+
     //free the allocated memory:
     TN * temp =  headNodePart1;
     while (temp != NULL) {
@@ -234,7 +255,9 @@ int main() {
         temp =  temp->next;
         free(toFree);
     }
+
     temp =  headNodePart2;
+    
     while (temp != NULL) {
         TN * toFree = temp;
         temp =  temp->next;
