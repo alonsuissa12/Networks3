@@ -7,7 +7,7 @@ struct timeNode{
 };
 typedef struct timeNode TN;
 
-//A method to add new timeNode to the LinkedList
+//A method to create a new timeNode
 TN *createNewNode(double time){
     TN *result = malloc(sizeof(TN));
     result->time = time;
@@ -52,6 +52,7 @@ int main() {
     //initializing a TCP socket.
     int sock = socket(AF_INET, SOCK_STREAM, 0);
     struct sockaddr_in senderAddress;
+
     //setting to zero the struct senderAddress
     memset(&senderAddress, 0, sizeof(senderAddress));
     senderAddress.sin_family = AF_INET;
@@ -61,12 +62,14 @@ int main() {
         printf("inet_pton() failed.\n");
         return -1;
     }
+
     //opening the socket.
     int Bcheck = bind(sock, (struct sockaddr *) &senderAddress, sizeof(senderAddress));
     if (Bcheck == -1) {
         printf("Error while binding.\n");
         return -1;
     }
+
     //start listening on the socket (one client at the time)
     int Lcheck = listen(sock, 1);
     if (Lcheck == -1) {
@@ -74,22 +77,21 @@ int main() {
         return -1;
     }
 
-    //First node to start the list (demo node). we hold two lists on for each part.
-    TN *headNodePart1;
-    TN *headNodePart2;
-
-    //Buffer to receive the data from the packets into.
-    char MsgBuffer[FILE_SIZE / 2] = {'0'};
-    memset(&senderAddress, 0, sizeof(senderAddress));
-    unsigned int senderAddressLen = sizeof(senderAddress);
-
     //accepting the client (the Sender)
+    unsigned int senderAddressLen = sizeof(senderAddress);
     int senderSock = accept(sock, (struct sockaddr *) &senderAddress, &senderAddressLen);
     if (senderSock == -1) {
         printf("accept() failed.\n");
         close(sock);
         return -1;
     }
+
+    //First node to start the list. we hold two lists on for each part.
+    TN *headNodePart1;
+    TN *headNodePart2;
+
+    //Buffer to receive the data from the packets into.
+    char MsgBuffer[FILE_SIZE / 2] = {'0'};
 
     //we will stay in the loop and keep receiving massages until we get an exit massage.
     while(1){
@@ -151,7 +153,7 @@ int main() {
         node1->next = headNodePart1;
         headNodePart1 = node1;
 
-        //Sending  authentication.
+        //Sending authentication.
         int x = (7351^4015);
         if((int)(send(senderSock, &x, sizeof(x) - 1, 0)) == -1){
            printf("Error in send().\n");
@@ -194,9 +196,9 @@ int main() {
         }
 
         //converting the measure time to seconds format (double).
-         sec = (double )(end.tv_sec - start.tv_sec);
-         usec =(double )(end.tv_usec - start.tv_usec);
-         measureTime = sec + (usec / 1000000);
+        sec = (double )(end.tv_sec - start.tv_sec);
+        usec =(double )(end.tv_usec - start.tv_usec);
+        measureTime = sec + (usec / 1000000);
 
         //Saving the time.
         TN *node2;
@@ -240,6 +242,7 @@ int main() {
     sum2 = index_sum2[1];
 
     printf("\n");
+    
     //Printing out the average time of the first part.
     double avg = (sum1 / index1);
     printf("The average of the first part (sent with reno CC algorithm) is: %f\n" , avg);
@@ -257,7 +260,7 @@ int main() {
     }
 
     temp =  headNodePart2;
-    
+
     while (temp != NULL) {
         TN * toFree = temp;
         temp =  temp->next;
