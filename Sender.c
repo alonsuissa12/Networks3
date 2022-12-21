@@ -57,6 +57,7 @@ int main(){
     }
     
     char again = 'y';
+    char exit = 'n';
     while (again == 'y' || again == 'Y') {
         //chang CC algorithm to 'reno'
         char CC[7] ="reno";
@@ -109,7 +110,6 @@ int main(){
             //checking for proper input
             while((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
                 printf("Please enter (y/n).\n");
-                fflush(stdin);
                 if(scanf(" %c", &again) != 1) {
                     printf("Scanning FAILED!.\n");
                     return -1;
@@ -119,23 +119,22 @@ int main(){
             if( again == 'n' || again == 'N') {
                 printf("Do you want to exit? (y/n)\n");
 
-                if (scanf(" %c", &again) != 1) {
+                if (scanf(" %c", &exit) != 1) {
                     printf("Scanning FAILED!.\n");
                     return -1;
                 }
                 
                 //checking for proper input
-                while ((again != 'y') && (again != 'Y') && (again != 'N') && (again != 'n')) {
+                while ((exit != 'y') && (exit != 'Y') && (exit != 'N') && (exit != 'n')) {
                     printf("Please enter (y/n).\n");
-                    fflush(stdin);
 
-                    if(scanf(" %c", &again) != 1) {
+                    if(scanf(" %c", &exit) != 1) {
                         printf("Scanning FAILED!.\n");
                         return -1;
                     }
                 }
 
-                if (again == 'y' || again == 'Y') {
+                if (exit == 'y' || exit == 'Y') {
                     printf("Sending exit massage.\n");
 
                     if(send(sock, "I want to exit NOW!!!! thanks :)", 34, 0) == -1){
